@@ -29,6 +29,7 @@
       document.getElementById('text').setAttribute('font-weight', ftweight);
       document.getElementById('text').setAttribute('font-size', ftsize);
       document.getElementById('text').setAttribute('fill', txtcolor);
+      document.getElementById('text').innerHTML = text;
 
       const textBoundingRect = document.getElementById('text').getBoundingClientRect();
       const x = Math.round((width / 2) + (textBoundingRect.width / 2) - (ftsize / 2));
