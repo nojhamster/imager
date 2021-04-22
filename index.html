@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Imager</title>
+  <script type="text/javascript">
+    window.onload = function() {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+
+      const bgcolor = urlParams.get('bgcolor') || '#e74c3c';
+      const txtcolor = urlParams.get('txtcolor') || '#fff';
+      const ftsize = urlParams.get('ftsize') || 35;
+      const ftweight = urlParams.get('ftweight') || 'bold';
+      const ftfamily = urlParams.get('ftfamily') || 'Arial';
+      const width = urlParams.get('width') || 200;
+      const height = urlParams.get('height') || 400;
+      const text = urlParams.get('text') || 'My category';
+
+      document.getElementById('svg').setAttribute('height', `${height}px`);
+      document.getElementById('svg').setAttribute('width', `${width}px`);
+
+      document.getElementById('rect').setAttribute('height', `${height}px`);
+      document.getElementById('rect').setAttribute('width', `${width}px`);
+      document.getElementById('rect').setAttribute('fill', bgcolor);
+
+      document.getElementById('text').setAttribute('font-family', ftfamily);
+      document.getElementById('text').setAttribute('font-weight', ftweight);
+      document.getElementById('text').setAttribute('font-size', ftsize);
+      document.getElementById('text').setAttribute('fill', txtcolor);
+
+      const textBoundingRect = document.getElementById('text').getBoundingClientRect();
+      const x = Math.round((width / 2) + (textBoundingRect.width / 2) - (ftsize / 2));
+      const y = Math.round((height / 2) + (textBoundingRect.height / 2));
+
+      document.getElementById('text').setAttribute('transform', `translate(${x}, ${y}) rotate(-90)`);
+    }
+  </script>
+</head>
+<body>
+
+  <svg id="svg" width="200" height="400">
+    <rect id="rect" width="200" height="400" fill="#e74c3c" />
+    <text id="text" transform="translate(100, 303) rotate(-90)" font-weight="bold" font-family="Arial" font-size="35" fill="white">
+      My category
+    </text>
+  </svg> 
+  
+</body>
+</html>
