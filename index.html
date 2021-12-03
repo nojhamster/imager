@@ -6,47 +6,41 @@
   <title>Imager</title>
   <script type="text/javascript">
     window.onload = function() {
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
+      const urlParams = new URLSearchParams(window.location.search);
+      const params = Object.fromEntries(urlParams.entries());
 
-      const bgcolor = urlParams.get('bgcolor') || '#e74c3c';
-      const txtcolor = urlParams.get('txtcolor') || '#fff';
-      const ftsize = urlParams.get('ftsize') || 35;
-      const ftweight = urlParams.get('ftweight') || 'bold';
-      const ftfamily = urlParams.get('ftfamily') || 'Arial';
-      const width = urlParams.get('width') || 200;
-      const height = urlParams.get('height') || 400;
-      const text = urlParams.get('text') || 'My category';
+      const bgcolor = params.bgcolor || '#e74c3c';
+      const txtcolor = params.txtcolor || '#fff';
+      const ftsize = params.ftsize || 35;
+      const ftweight = params.ftweight || 'bolder';
+      const ftfamily = params.ftfamily || 'Arial';
+      const width = params.width || 200;
+      const height = params.height || 400;
+      const text = params.text || 'My category';
 
-      document.getElementById('svg').setAttribute('height', `${height}px`);
-      document.getElementById('svg').setAttribute('width', `${width}px`);
+      const canvas = document.querySelector('canvas');
 
-      document.getElementById('rect').setAttribute('height', `${height}px`);
-      document.getElementById('rect').setAttribute('width', `${width}px`);
-      document.getElementById('rect').setAttribute('fill', bgcolor);
+      canvas.setAttribute('height', `${height}px`);
+      canvas.setAttribute('width', `${width}px`);
 
-      document.getElementById('text').setAttribute('font-family', ftfamily);
-      document.getElementById('text').setAttribute('font-weight', ftweight);
-      document.getElementById('text').setAttribute('font-size', ftsize);
-      document.getElementById('text').setAttribute('fill', txtcolor);
-      document.getElementById('text').innerHTML = text;
+      const ctx = canvas.getContext('2d');
 
-      const textBoundingRect = document.getElementById('text').getBoundingClientRect();
-      const x = Math.round((width / 2) + (textBoundingRect.width / 2) - (ftsize / 2));
-      const y = Math.round((height / 2) + (textBoundingRect.height / 2));
+      ctx.fillStyle = bgcolor;
+      ctx.fillRect(0, 0, width, height);
+      ctx.fill();
 
-      document.getElementById('text').setAttribute('transform', `translate(${x}, ${y}) rotate(-90)`);
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.font = `${ftweight} ${ftsize}px ${ftfamily}`;
+      ctx.fillStyle = txtcolor;
+      ctx.fillText(text, 0, 0);
     }
   </script>
 </head>
 <body>
 
-  <svg id="svg" width="200" height="400">
-    <rect id="rect" width="200" height="400" fill="#e74c3c" />
-    <text id="text" transform="translate(100, 303) rotate(-90)" font-weight="bold" font-family="Arial" font-size="35" fill="white">
-      My category
-    </text>
-  </svg> 
+  <canvas id="canvas" width="200" height="400"></canvas>
   
 </body>
 </html>
