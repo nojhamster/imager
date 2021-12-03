@@ -35,12 +35,21 @@
       ctx.font = `${ftweight} ${ftsize}px ${ftfamily}`;
       ctx.fillStyle = txtcolor;
       ctx.fillText(text, 0, 0);
+
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        document.getElementById('downloadLink').href = url;
+      }, 'image/png');
+
+      console.log(canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
     }
   </script>
 </head>
 <body>
 
   <canvas id="canvas" width="200" height="400"></canvas>
+  <br />
+  <a id="downloadLink" href="#" download="category.png">Download</a>
   
 </body>
 </html>
