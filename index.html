@@ -4,52 +4,242 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Imager</title>
+
+  <style>
+    #canvasInputs {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      max-width: 500px;
+      grid-gap: 0.5em;
+    }
+    #actions {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    input[type=color] {
+      width: 100%;
+    }
+  </style>
+
   <script type="text/javascript">
     window.onload = function() {
       const urlParams = new URLSearchParams(window.location.search);
       const params = Object.fromEntries(urlParams.entries());
 
-      const bgcolor = params.bgcolor || '#e74c3c';
-      const txtcolor = params.txtcolor || '#fff';
-      const ftsize = params.ftsize || 35;
-      const ftweight = params.ftweight || 'bolder';
-      const ftfamily = params.ftfamily || 'Arial';
-      const width = params.width || 200;
-      const height = params.height || 400;
-      const text = params.text || 'My category';
+      const imgParams = {
+        bgcolor: params.bgcolor || '#e74c3c',
+        txtcolor: params.txtcolor || '#fff',
+        ftsize: params.ftsize || 35,
+        ftweight: params.ftweight || 'bolder',
+        ftfamily: params.ftfamily || 'Arial',
+        width: params.width || 200,
+        height: params.height || 400,
+        text: params.text || 'My category',
+        textAlign: params.textAlign || 'center',
+        textBaseline: params.textBaseline || 'middle',
+        textRotate: Number.parseInt(params.textRotate, 10),
+        textPosX: Number.parseInt(params.textPosX, 10),
+        textPosY: Number.parseInt(params.textPosY, 10),
+      };
+
+      if (!Number.isInteger(imgParams.textRotate) || imgParams.textRotate < 0 || imgParams.textRotate > 360) {
+        imgParams.textRotate = 270;
+      }
+      if (!Number.isInteger(imgParams.textPosX) || imgParams.textPosX < 0 || imgParams.textPosX > 100) {
+        imgParams.textPosX = 50;
+      }
+      if (!Number.isInteger(imgParams.textPosY) || imgParams.textPosY < 0 || imgParams.textPosY > 100) {
+        imgParams.textPosY = 50;
+      }
+
+      const inputs = [
+        {
+          name: 'text',
+          label: 'Text',
+          attrs: { type: 'text' }
+        },
+        {
+          name: 'width',
+          label: 'Width',
+          attrs: { type: 'number' }
+        },
+        {
+          name: 'height',
+          label: 'Height',
+          attrs: { type: 'number' }
+        },
+        {
+          name: 'bgcolor',
+          label: 'Background color',
+          showValue: true,
+          attrs: { type: 'color' }
+        },
+        {
+          name: 'txtcolor',
+          label: 'Text color',
+          showValue: true,
+          attrs: { type: 'color' }
+        },
+        {
+          name: 'ftsize',
+          label: 'Font size',
+          attrs: { type: 'number' }
+        },
+        {
+          name: 'ftweight',
+          label: 'Font weight',
+          attrs: { type: 'text' }
+        },
+        {
+          name: 'ftfamily',
+          label: 'Font familly',
+          attrs: { type: 'text' }
+        },
+        {
+          name: 'textRotate',
+          label: 'Text rotate',
+          showValue: true,
+          attrs: { type: 'range', min: 0, max: 360, step: 5 }
+        },
+        {
+          name: 'textAlign',
+          label: 'Text align',
+          type: 'select',
+          attrs: {},
+          options: [
+            { label: 'Start', value: 'start' },
+            { label: 'End', value: 'end' },
+            { label: 'Left', value: 'left' },
+            { label: 'Center', value: 'center' },
+            { label: 'Right', value: 'right' },
+          ],
+        },
+        {
+          name: 'textBaseline',
+          label: 'Text baseline',
+          type: 'select',
+          attrs: {},
+          options: [
+            { label: 'Top', value: 'top' },
+            { label: 'Bottom', value: 'bottom' },
+            { label: 'Middle', value: 'middle' },
+            { label: 'Alphabetic', value: 'alphabetic' },
+            { label: 'Hanging', value: 'hanging' },
+          ],
+        },
+        {
+          name: 'textPosX',
+          label: 'Text position X',
+          showValue: true,
+          attrs: { type: 'range', min: 0, max: 100, step: 1 }
+        },
+        {
+          name: 'textPosY',
+          label: 'Text position Y',
+          showValue: true,
+          attrs: { type: 'range', min: 0, max: 100, step: 1 }
+        },
+      ];
 
       const canvas = document.querySelector('canvas');
 
-      canvas.setAttribute('height', `${height}px`);
-      canvas.setAttribute('width', `${width}px`);
+      function refreshCanvas() {
+        canvas.setAttribute('height', `${imgParams.height}px`);
+        canvas.setAttribute('width', `${imgParams.width}px`);
 
-      const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
 
-      ctx.fillStyle = bgcolor;
-      ctx.fillRect(0, 0, width, height);
-      ctx.fill();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = imgParams.bgcolor;
+        ctx.fillRect(0, 0, imgParams.width, imgParams.height);
+        ctx.fill();
 
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.textAlign = 'center';
-      ctx.font = `${ftweight} ${ftsize}px ${ftfamily}`;
-      ctx.fillStyle = txtcolor;
-      ctx.fillText(text, 0, 0);
+        ctx.translate(canvas.width * imgParams.textPosX / 100, canvas.height * imgParams.textPosY / 100);
+        ctx.rotate(imgParams.textRotate * (Math.PI / 180));
+        ctx.textAlign = imgParams.textAlign;
+        ctx.textBaseline = imgParams.textBaseline;
+        ctx.font = `${imgParams.ftweight} ${imgParams.ftsize}px ${imgParams.ftfamily}`;
+        ctx.fillStyle = imgParams.txtcolor;
+        ctx.fillText(imgParams.text, 0, 0);
+      }
+
+      refreshCanvas();
 
       canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         document.getElementById('downloadLink').href = url;
       }, 'image/png');
 
-      console.log(canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream'))
+      document.getElementById('copyPngDataUrl').addEventListener('click', () => {
+        navigator.clipboard.writeText(canvas.toDataURL('image/png'));
+      });
+      document.getElementById('copyJpegDataUrl').addEventListener('click', () => {
+        navigator.clipboard.writeText(canvas.toDataURL('image/jpeg'));
+      });
+
+      document.getElementById('copyUrl').addEventListener('click', () => {
+        const url = new URL(window.location.href);
+
+        Object.entries(imgParams).forEach(([paramName, paramValue]) => {
+          url.searchParams.set(paramName, paramValue);
+        });
+
+        navigator.clipboard.writeText(url);
+      });
+
+      const inputsContainer = document.getElementById('canvasInputs');
+
+      inputsContainer.append(...inputs.flatMap(item => {
+        const inputId = `input-${item.name}`;
+
+        const label = document.createElement('label');
+        label.setAttribute('for', inputId);
+        label.textContent = item.label;
+
+        const input = document.createElement(item.type || 'input');
+        input.setAttribute('id', inputId);
+
+        Object.entries(item.attrs || {}).forEach(([attrName, attrValue]) => {
+          input.setAttribute(attrName, attrValue);
+        });
+
+        if (item.options) {
+          input.append(...item.options.map(opt => {
+            const option = document.createElement('option');
+            option.textContent = opt.label;
+            option.value = opt.value;
+            return option;
+          }));
+        }
+        input.value = imgParams[item.name];
+
+        const appended = document.createElement('div');
+        appended.textContent = item.showValue ? input.value : '';
+
+        input.addEventListener('input', () => {
+          imgParams[item.name] = input.value;
+          appended.textContent = item.showValue ? input.value : '';
+          refreshCanvas();
+        });
+
+        return [label, input, appended];
+      }));
     }
   </script>
 </head>
 <body>
 
+  <div id="canvasInputs"></div>
+
+  <div id="actions">
+    <div><a id="downloadLink" href="#" download="category.png">Download</a></div>
+    <div><a id="copyPngDataUrl" href="javascript:void(0);">Copy as base64 PNG</a></div>
+    <div><a id="copyJpegDataUrl" href="javascript:void(0);">Copy as base64 JPEG</a></div>
+    <div><a id="copyUrl" href="javascript:void(0);">Copy current state as URL</a></div>
+  </div>
+
   <canvas id="canvas" width="200" height="400"></canvas>
-  <br />
-  <a id="downloadLink" href="#" download="category.png">Download</a>
-  
+
 </body>
 </html>
