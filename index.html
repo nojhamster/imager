@@ -179,10 +179,26 @@
 
       refreshCanvas();
 
-      canvas.toBlob((blob) => {
-        const url = URL.createObjectURL(blob);
-        document.getElementById('downloadLink').href = url;
-      }, 'image/png');
+      function slugify(text) {
+        return text.toString().toLowerCase().trim()
+          .normalize('NFD') 				       // separate accent from letter
+          .replace(/[\u0300-\u036f]/g, '') // remove all separated accents
+          .replace(/\s+/g, '-')            // replace spaces with -
+          .replace(/&/g, '-and-')          // replace & with 'and'
+          .replace(/[^\w\-]+/g, '')        // remove all non-word chars
+          .replace(/\-\-+/g, '-')          // replace multiple '-' with single '-'
+      }
+
+      document.getElementById('downloadLink').addEventListener('click', (evt) => {
+        canvas.toBlob((blob) => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = `${slugify(imgParams.text)}.png`;
+          a.click();
+
+          URL.revokeObjectURL(a.href);
+        }, 'image/png');
+      });
 
       document.getElementById('base64exporter').addEventListener('submit', (evt) => {
         evt.preventDefault();
@@ -250,7 +266,7 @@
 
   <div id="actions">
     <div><a id="copyUrl" href="javascript:void(0);">Copy current state as URL</a></div>
-    <div><a id="downloadLink" href="#" download="category.png">Download</a></div>
+    <div><a id="downloadLink" href="javascript:void(0);">Download</a></div>
     <div><a href="javascript:void(0);" onclick="document.getElementById('base64exporter').classList.toggle('hidden')">Copy as base64</a></div>
   </div>
 
