@@ -20,6 +20,19 @@
     input[type=color] {
       width: 100%;
     }
+    #base64exporter {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      max-width: 300px;
+      grid-gap: 0.5em;
+      margin-bottom: 20px;
+      border: 1px solid #686868;
+      padding: 5px;
+      border-radius: 3px;
+    }
+    #base64exporter.hidden {
+      display: none;
+    }
   </style>
 
   <script type="text/javascript">
@@ -171,11 +184,14 @@
         document.getElementById('downloadLink').href = url;
       }, 'image/png');
 
-      document.getElementById('copyPngDataUrl').addEventListener('click', () => {
-        navigator.clipboard.writeText(canvas.toDataURL('image/png'));
-      });
-      document.getElementById('copyJpegDataUrl').addEventListener('click', () => {
-        navigator.clipboard.writeText(canvas.toDataURL('image/jpeg'));
+      document.getElementById('base64exporter').addEventListener('submit', (evt) => {
+        evt.preventDefault();
+        const format = evt?.target?.elements?.format?.value;
+        const quality = Number.parseFloat(evt?.target?.elements?.quality?.value);
+
+        navigator.clipboard.writeText(canvas.toDataURL(`image/${format}`, quality));
+
+        return false;
       });
 
       document.getElementById('copyUrl').addEventListener('click', () => {
@@ -233,11 +249,23 @@
   <div id="canvasInputs"></div>
 
   <div id="actions">
-    <div><a id="downloadLink" href="#" download="category.png">Download</a></div>
-    <div><a id="copyPngDataUrl" href="javascript:void(0);">Copy as base64 PNG</a></div>
-    <div><a id="copyJpegDataUrl" href="javascript:void(0);">Copy as base64 JPEG</a></div>
     <div><a id="copyUrl" href="javascript:void(0);">Copy current state as URL</a></div>
+    <div><a id="downloadLink" href="#" download="category.png">Download</a></div>
+    <div><a href="javascript:void(0);" onclick="document.getElementById('base64exporter').classList.toggle('hidden')">Copy as base64</a></div>
   </div>
+
+  <form id="base64exporter" class="hidden">
+    <div>Format</div>
+    <div>Quality</div>
+    <div></div>
+
+    <select name="format">
+      <option value="png">PNG</option>
+      <option value="jpeg">JPEG</option>
+    </select>
+    <input name="quality" type="range" step="0.1" min="0" max="1" value="1" />
+    <button type="submit">Copy</button>
+  </form>
 
   <canvas id="canvas" width="200" height="400"></canvas>
 
